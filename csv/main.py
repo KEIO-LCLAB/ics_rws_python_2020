@@ -20,6 +20,8 @@ def post_ifttt(event_id, json):
 
 # csvファイルを開く
 file = open("./csv/data.csv")
+# csvファイルを絶対パスから開く
+#file = open(r"C:\\Users\○○\...\○○.csv")
 
 # リストとして読み込む
 reader = csv.reader(file)

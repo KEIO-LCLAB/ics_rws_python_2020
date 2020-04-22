@@ -20,6 +20,8 @@ def post_ifttt(event_id, json):
 
 # Excelファイルをインポート
 book = xlrd.open_workbook("./excel/data.xls")
+# csvファイルを絶対パスから開く
+#file = open(r"C:\\Users\○○\...\○○.xls")
 
 # Excelにシートが複数ある場合，0から始まるインデックスで何枚目か指定する
 sheet = book.sheet_by_index(0)
