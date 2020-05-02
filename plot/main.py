@@ -1,31 +1,16 @@
 # Python 3.8.1
-import csv
+import xlrd  # 1.2.0
 import numpy as np  # 1.18.1
 from matplotlib import pyplot as plt  # 3.2.1
-import requests  # 2.23.0
 
 
-# プログラムを終了するにはターミナルでCtrl+Cを何度か入力してください
+# Excelファイルをインポート
+book = xlrd.open_workbook("./excel/data.xls")
+# Excelファイルを絶対パスから開く
+# book = xlrd.open_workbook(r"C:\\Users\○○\...\○○.xls")
 
-# 特定のイベントにjsonをPOSTする関数
-def post_ifttt(event_id, json):
-    url = (
-        "https://maker.ifttt.com/trigger/"
-        + event_id
-        + "/with/key/"
-        + "***YOUR WEBHOOK KEY***"
-    )
-    requests.post(url, json)
-
-
-# csvファイルを開く
-file = open("./csv/data.csv")
-# csvファイルを絶対パスから開く
-# file = open(r"C:\\Users\○○\...\○○.csv")
-
-# リストとして読み込む
-reader = csv.reader(file)
-input_data = [row for row in reader]
+# Excelにシートが複数ある場合，0から始まるインデックスで何枚目か指定する
+sheet = book.sheet_by_index(0)
 
 # matplotlibのインタラクティブモードをONに
 # 数値を動的に変更できる
@@ -65,38 +50,17 @@ plt.ylabel("a [m/s^2]")
 
 # 時間の初期値をt_intとする
 # 1サンプルあたりかかる時間をt_diffとする
-# データの途中から処理を始めたい場合は，範囲を適宜変更するかcsvファイルを編集してください
-# インデックスは[行][列]の順番です
-t_int = float(input_data[1][0])
-t_diff = float(input_data[2][0]) - float(input_data[1][0])
-
-# 独自処理のための初期設定ここから---------------------------------
-# Webhookへのリクエストが大量に送信されないようにヒステリシスを設定する
-# 最大値を超えたらリクエストを送り，最小値を下回るまで送るのを中止する
-hysteresis_max = 6
-hysteresis_min = 2
-hysteresis_flag = False
-# イベントID
-event_id = "***EVENT ID***"
-# 送信するjson
-json = {"value1": "Acceleration over 6 m/s^2 was detected."}
-# 独自処理のための初期設定ここまで---------------------------------
+# データの途中から処理を始めたい場合は，範囲を適宜変更するかExcelファイルを編集してください
+data1 = sheet.row_values(1)
+data2 = sheet.row_values(2)
+t_int = float(data1[0])
+t_diff = float(data2[0] - data1[0])
 
 # 初期値を除くすべての行に関して処理を繰り返す
-for rownum in range(2, len(input_data)):
+for rownum in range(2, sheet.nrows):
     try:
         # 新しい行を読み込み
-        data = input_data[rownum]
-
-        # 独自処理ここから-----------------------------------------------------------------
-        # 加速度の絶対値がhysteresis_maxを超えたらWebhookへリクエスト送信し，フラグを立てる
-        if float(data[4]) > hysteresis_max and hysteresis_flag is False:
-            post_ifttt(event_id, json)
-            hysteresis_flag = True
-        # 加速度の絶対値がhysteresis_minを下回ったらフラグを下ろす
-        elif float(data[4]) < hysteresis_min and hysteresis_flag is True:
-            hysteresis_flag = False
-        # 独自処理ここまで-----------------------------------------------------------------
+        data = sheet.row_values(rownum)
 
         # グラフの表示範囲指定のため，センサデータの最大最小値を記録しておく
         ymaxs = []
