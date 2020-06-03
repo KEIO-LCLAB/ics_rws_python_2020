@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt  # 3.2.1
 
 
 # Excelファイルをインポート
-book = xlrd.open_workbook("./excel/data.xls")
+book = xlrd.open_workbook("./data.xls")
 # Excelファイルを絶対パスから開く
 # book = xlrd.open_workbook(r"C:\\Users\○○\...\○○.xls")
 
